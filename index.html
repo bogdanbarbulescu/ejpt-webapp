@@ -3,150 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eJPT Exam Helper</title>
+    <title>eJPT Exam Helper v2</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --content-bg: #2b3035; /* Slightly lighter than body for content area */
-            --code-bg: #1c1e21;    /* Darker background for code blocks */
-            --code-text: #e8e6e3;
-            --sidebar-bg: #212529;
-            --sidebar-link-hover: #343a40;
-        }
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
 
-        body {
-            display: flex;
-            height: 100vh;
-            overflow: hidden; /* Prevent body scroll */
-        }
-
-        #sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: var(--sidebar-bg);
-            padding-top: 1rem;
-            flex-shrink: 0;
-            overflow-y: auto; /* Allow sidebar scrolling if needed */
-            position: fixed; /* Fixed sidebar */
-            top: 0;
-            left: 0;
-            z-index: 100;
-        }
-
-        #main-content {
-            flex-grow: 1;
-            height: 100vh;
-            overflow-y: auto; /* Allow content scrolling */
-            padding: 2rem;
-            background-color: var(--content-bg);
-            margin-left: var(--sidebar-width); /* Offset content by sidebar width */
-        }
-
-        .sidebar-heading {
-            padding: 0.5rem 1.25rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--bs-secondary-color);
-        }
-
-        .list-group-item {
-            background-color: transparent;
-            border: none;
-            border-radius: 0.25rem;
-            margin: 0 0.5rem 0.2rem 0.5rem; /* Add some margin */
-            transition: background-color 0.15s ease-in-out;
-        }
-
-        .list-group-item.active {
-            background-color: var(--bs-primary);
-            color: #fff;
-        }
-
-        .list-group-item:hover:not(.active) {
-            background-color: var(--sidebar-link-hover);
-        }
-
-        .list-group-item i {
-            margin-right: 0.75rem;
-            width: 1.2em; /* Align icons */
-        }
-
-        .content-section {
-            display: none; /* Hide all sections by default */
-        }
-
-        .content-section.active {
-            display: block; /* Show the active section */
-        }
-
-        /* Code block styling */
-        pre {
-            background-color: var(--code-bg);
-            color: var(--code-text);
-            padding: 1rem;
-            border-radius: 0.375rem;
-            border: 1px solid var(--bs-border-color);
-            overflow-x: auto; /* Allow horizontal scrolling for long lines */
-            font-size: 0.9em;
-            white-space: pre; /* Preserve whitespace and prevent wrapping */
-        }
-
-        code {
-            color: var(--code-text);
-            word-wrap: break-word; /* Allow inline code to wrap if needed */
-            background-color: rgba(110, 118, 129, 0.2); /* Subtle background for inline code */
-            padding: 0.1em 0.3em;
-            border-radius: 3px;
-        }
-
-        pre code {
-            background-color: transparent; /* No extra background inside pre */
-            padding: 0;
-            border-radius: 0;
-        }
-
-        /* Improve checklist readability */
-        .checklist ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        .checklist li {
-            margin-bottom: 0.75rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-        .checklist li::before {
-            content: "☐"; /* Unchecked box */
-            position: absolute;
-            left: 0;
-            top: 1px;
-            font-family: 'bootstrap-icons'; /* Or use a text character */
-            color: var(--bs-secondary-color);
-        }
-        /* Style for completed items (optional, manual check) */
-        /* .checklist li.completed::before { content: "☑"; color: var(--bs-success); } */
-
-        h2, h3, h4 {
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--bs-border-color);
-            padding-bottom: 0.5rem;
-        }
-         h2:first-child, h3:first-child, h4:first-child {
-             margin-top: 0; /* Remove top margin for first heading */
-         }
-    </style>
 </head>
 <body>
 
     <!-- Sidebar Navigation -->
     <div id="sidebar">
-        <div class="sidebar-heading">eJPT Helper</div>
+        <div class="sidebar-heading">eJPT Helper v2</div>
         <div class="list-group list-group-flush">
+            <!-- Links will remain mostly the same, data-target is key -->
             <a href="#" class="list-group-item list-group-item-action active" data-target="methodology">
                 <i class="bi bi-list-check"></i> Methodology
             </a>
@@ -177,12 +50,15 @@
             <a href="#" class="list-group-item list-group-item-action" data-target="os-commands">
                 <i class="bi bi-file-code"></i> OS Commands
             </a>
+             <a href="#" class="list-group-item list-group-item-action" data-target="tools">
+                <i class="bi bi-tools"></i> Useful Tools
+            </a>
         </div>
     </div>
 
     <!-- Main Content Area -->
     <div id="main-content">
-
+        <!-- Content sections will be loaded here, but start with the initial one -->
         <!-- Methodology Section -->
         <div id="methodology" class="content-section active checklist">
             <h2><i class="bi bi-list-check"></i> Penetration Testing Methodology Checklist</h2>
@@ -862,58 +738,65 @@ hydra -L users.txt -P pass.txt <TARGET_IP> http-post-form "/login.php:user=^USER
             </ul>
         </div>
 
+         <!-- Useful Tools Section -->
+         <div id="tools" class="content-section">
+            <h2><i class="bi bi-tools"></i> Useful Tools Summary</h2>
+            <p>This section provides a quick list of commonly used tools mentioned throughout the cheatsheets.</p>
+            <ul>
+                <li><strong>Scanning & Enumeration:</strong>
+                    <ul>
+                        <li><code>nmap</code>: Network scanning, port scanning, service detection, OS detection, NSE scripting.</li>
+                        <li><code>gobuster</code> / <code>feroxbuster</code>: Web directory/file brute-forcing.</li>
+                        <li><code>nikto</code>: Web server vulnerability scanner.</li>
+                        <li><code>enum4linux-ng</code> / <code>smbclient</code>: SMB enumeration (shares, users).</li>
+                        <li><code>showmount</code>: NFS enumeration.</li>
+                        <li><code>snmp-check</code> / <code>snmpwalk</code>: SNMP enumeration.</li>
+                        <li><code>dig</code>: DNS queries (especially AXFR).</li>
+                        <li><code>smtp-user-enum</code>: SMTP user enumeration.</li>
+                    </ul>
+                </li>
+                <li><strong>Exploitation:</strong>
+                    <ul>
+                        <li><code>metasploit-framework</code> (<code>msfconsole</code>): Exploit framework, payload generation, handler.</li>
+                        <li><code>searchsploit</code>: Command-line Exploit-DB search.</li>
+                        <li><code>nc</code> (Netcat): Listener, reverse/bind shells, port scanning, banner grabbing.</li>
+                        <li><code>msfvenom</code>: Standalone payload generator.</li>
+                    </ul>
+                </li>
+                <li><strong>Web Specific:</strong>
+                    <ul>
+                        <li><code>Burp Suite</code>: Web proxy, repeater, intruder (fuzzing).</li>
+                        <li>Browser DevTools (F12): Inspecting elements, network requests, console.</li>
+                    </ul>
+                </li>
+                 <li><strong>Password Attacks:</strong>
+                    <ul>
+                        <li><code>hydra</code>: Online brute-force attacks (various protocols).</li>
+                        <li><code>john</code> (John the Ripper) / <code>hashcat</code>: Offline hash cracking (requires hash extraction).</li>
+                    </ul>
+                </li>
+                 <li><strong>Privilege Escalation:</strong>
+                    <ul>
+                        <li><code>LinPEAS</code> / <code>WinPEAS</code>: Automated enumeration scripts for Linux/Windows.</li>
+                        <li><code>PowerUp.ps1</code>: Windows privilege escalation checks (PowerShell).</li>
+                        <li><code>GTFOBins</code> (Website): Linux binaries that can be abused for privilege escalation.</li>
+                    </ul>
+                </li>
+                 <li><strong>Pivoting:</strong>
+                    <ul>
+                        <li><code>proxychains</code>: Route tool traffic through a SOCKS proxy.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+
     </div> <!-- /main-content -->
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Bootstrap Bundle JS (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
-    <!-- Custom JS for Navigation -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarLinks = document.querySelectorAll('#sidebar .list-group-item');
-            const contentSections = document.querySelectorAll('.content-section');
-
-            // Function to switch active content
-            function showContent(targetId) {
-                // Hide all content sections
-                contentSections.forEach(section => {
-                    section.classList.remove('active');
-                });
-
-                // Deactivate all sidebar links
-                sidebarLinks.forEach(link => {
-                    link.classList.remove('active');
-                });
-
-                // Show the target content section
-                const targetSection = document.getElementById(targetId);
-                if (targetSection) {
-                    targetSection.classList.add('active');
-                }
-
-                // Activate the clicked sidebar link
-                const activeLink = document.querySelector(`#sidebar .list-group-item[data-target="${targetId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                }
-            }
-
-            // Add click listeners to sidebar links
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevent default link behavior
-                    const targetId = this.getAttribute('data-target');
-                    showContent(targetId);
-
-                    // Optional: Scroll content to top on switch
-                    document.getElementById('main-content').scrollTop = 0;
-                });
-            });
-
-            // Show the initial active section (Methodology)
-            showContent('methodology');
-        });
-    </script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
 
 </body>
 </html>
